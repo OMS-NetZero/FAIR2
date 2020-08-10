@@ -1,0 +1,58 @@
+name: FaIR CI-CD
+on: push
+
+jobs:
+  linting-and-docs:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dev dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -e .[dev] --use-feature=2020-resolver
+    - name: Formatting and linters
+      run: |
+        black --check fair tests setup.py
+        isort --check-only --quiet --recursive fair tests setup.py
+        flake8 fair tests setup.py
+        pylint fair
+  build:
+    needs: linting-and-docs
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install test dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -e .[tests] --use-feature=2020-resolver
+    - name: Test with pytest
+      env:
+        MIN_COVERAGE: 30
+      run: |
+          pytest tests -r a --cov=openscm_runner --cov-report=''
+          if ! coverage report --fail-under=${MIN_COVERAGE} --show-missing
+          then
+              echo
+              echo "Error: Test coverage has to be at least ${MIN_COVERAGE}"
+              exit 1
+          fi
