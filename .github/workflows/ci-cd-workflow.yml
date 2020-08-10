@@ -49,7 +49,7 @@ jobs:
       env:
         MIN_COVERAGE: 30
       run: |
-          pytest tests -r a --cov=openscm_runner --cov-report=''
+          pytest tests -r a --cov=fair --cov-report=''
           if ! coverage report --fail-under=${MIN_COVERAGE} --show-missing
           then
               echo

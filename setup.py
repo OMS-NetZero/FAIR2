@@ -26,6 +26,7 @@ REQUIREMENTS_DEV = [
 
 REQUIREMENTS_EXTRAS = {
     "dev": REQUIREMENTS_DEV,
+    "tests": REQUIREMENTS_TESTS,
 }
 
 # Get the long description from the README file
