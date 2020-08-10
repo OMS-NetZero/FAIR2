@@ -22,7 +22,7 @@ jobs:
         pip install -e .[dev] --use-feature=2020-resolver
     - name: Formatting and linters
       run: |
-        black --check fair tests setup.py
+        black --check fair tests setup.py --exclude fair/_version.py
         isort --check-only --quiet --recursive fair tests setup.py
         flake8 fair tests setup.py
         pylint fair
